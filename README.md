@@ -3,6 +3,8 @@ pi_romo
 
 Raspberry Pi Control library for 2nd generation Romotive protocol
 
+From prior Romotive notes:
+
 We went back to the drawing board and completely revamped the firmware. The new protocol is a PWM signal sent over the audio channel that gives the robot 255 speeds on each motor, along with the ability to have each AUX channel go forward, back, and stop.
 
 The PWM signal is comprised two channels, the left used for the clock signal and the right for the data signal. The PWM signal is generated as a square wave of 1000hz.
