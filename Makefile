@@ -1,4 +1,4 @@
-OBJS=audio.o sinewave.o
+OBJS=audio.o
 BIN=hello_audio.bin
 LDFLAGS+=-lilclient
 

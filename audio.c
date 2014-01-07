@@ -40,10 +40,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define N_WAVE          1024    /* dimension of Sinewave[] */
 #define PI (1<<16>>1)
-#define SIN(x) Sinewave[((x)>>6) & (N_WAVE-1)]
-#define COS(x) SIN((x)+(PI>>1))
+// #define SIN(x) Sinewave[((x)>>6) & (N_WAVE-1)]
+// #define COS(x) SIN((x)+(PI>>1))
 #define OUT_CHANNELS(num_channels) ((num_channels) > 4 ? 8: (num_channels) > 2 ? 4: (num_channels))
-extern short Sinewave[];
+// extern short Sinewave[];
 
 #ifndef countof
    #define countof(arr) (sizeof(arr) / sizeof(arr[0]))
@@ -361,8 +361,10 @@ void play_api_test(int samplerate, int bitdepth, int nchannels, int dest)
    int16_t sqval = 32766;
    int16_t lastval = 0;
    int16_t robocmd = 0;
+   long int commandsets = 0;
    
-   for (n=0; n<((samplerate * 1000)/ BUFFER_SIZE_SAMPLES); n++)
+   //for (n=0; n<((samplerate * 1000)/ BUFFER_SIZE_SAMPLES); n++)
+   for (n=0; n<((samplerate)/ BUFFER_SIZE_SAMPLES); n++)
    {
       uint8_t *buf;
       int16_t *p;
@@ -381,22 +383,26 @@ void play_api_test(int samplerate, int bitdepth, int nchannels, int dest)
                  
         // detect phase shift to count bits
          if (val >= 0 && lastval < 0)
-         	currentbit = currentbit + 1;
+         	currentbit++;
          
          lastval = val;
          
+         // first channel has a square wave at 1000hz
          if (currentbit >= 1 && currentbit <=12)
          	sqval = val > 0 ? 32767 : val < 0 ? -32767 : 0;
          else
          	sqval = -32767;
-
+		
+		 // second channel has the romocmds
          if (currentbit == 2 || currentbit == 12)
          	robocmd = 32767;
          else
          	robocmd = -32767;
          	
-         if (currentbit > 50)
+         if (currentbit > 50) {
          	currentbit = 0;
+         	commandsets++;
+         }
 
          for(j=0; j<OUT_CHANNELS(nchannels); j++)
          {
@@ -419,6 +425,8 @@ void play_api_test(int samplerate, int bitdepth, int nchannels, int dest)
    }
 
    audioplay_delete(st);
+   printf("n is %i\n",n);
+   printf("commandsets is %li\n",commandsets);
 }
 
 int main (int argc, char **argv)
@@ -435,6 +443,7 @@ int main (int argc, char **argv)
 
    if (argc > 1)
       audio_dest = atoi(argv[1]);
+      //printf("Test %c\n",argv[1][1]); this is a test of grabbing a character from the string
    if (argc > 2)
       channels = atoi(argv[2]);
    if (argc > 3)
