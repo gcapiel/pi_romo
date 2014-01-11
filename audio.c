@@ -461,7 +461,7 @@ int main (int argc, char **argv)
    printf("Outputting audio to %s\n", audio_dest==0 ? "analogue":"hdmi");
 
    play_api_test(romo_cmd, samplerate, bitdepth, channels, audio_dest);
-   usleep(cmd_length*1000000);
+   usleep(cmd_length*1000);
    // turn off all motors
    play_api_test("010100000000001100000000", samplerate, bitdepth, channels, audio_dest);
 
