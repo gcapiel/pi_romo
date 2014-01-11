@@ -339,7 +339,7 @@ uint32_t audioplay_get_latency(AUDIOPLAY_STATE_T *st)
 #define MIN_LATENCY_TIME 20
 
 static const char *audio_dest[] = {"local", "hdmi"};
-void play_api_test(int samplerate, int bitdepth, int nchannels, int dest)
+void play_api_test(char *cmd_str, int samplerate, int bitdepth, int nchannels, int dest)
 {
    AUDIOPLAY_STATE_T *st;
    int32_t ret;
@@ -364,7 +364,7 @@ void play_api_test(int samplerate, int bitdepth, int nchannels, int dest)
    long int commandsets = 0;
    
    //for (n=0; n<((samplerate * 1000)/ BUFFER_SIZE_SAMPLES); n++)
-   for (n=0; n<((samplerate)/ BUFFER_SIZE_SAMPLES); n++)
+   for (n=0; n<3; n++)
    {
       uint8_t *buf;
       int16_t *p;
@@ -388,17 +388,20 @@ void play_api_test(int samplerate, int bitdepth, int nchannels, int dest)
          lastval = val;
          
          // first channel has a square wave at 1000hz
-         if (currentbit >= 1 && currentbit <=12)
+         if ((currentbit >= 1 && currentbit <=12) || (currentbit >= 25 && currentbit <=36)) {
          	sqval = val > 0 ? 32767 : val < 0 ? -32767 : 0;
-         else
+         	if (cmd_str[(currentbit-(currentbit < 25 ? 1 : 13))] == '1') {
+		 		robocmd = 32767;
+		 		//printf("bit is %li\n", currentbit);
+		 	}
+		 	else
+		 		robocmd = -32767;
+         }
+         else {
          	sqval = -32767;
-		
-		 // second channel has the romocmds
-         if (currentbit == 2 || currentbit == 12)
-         	robocmd = 32767;
-         else
          	robocmd = -32767;
-         	
+         }				 
+		          	
          if (currentbit > 50) {
          	currentbit = 0;
          	commandsets++;
@@ -431,6 +434,9 @@ void play_api_test(int samplerate, int bitdepth, int nchannels, int dest)
 
 int main (int argc, char **argv)
 {
+
+   char *romo_cmd = "010100000000001100000000";
+   int cmd_length = 1;
    // 0=headphones, 1=hdmi
    int audio_dest = 0;
    // audio sample rate in Hz
@@ -442,16 +448,23 @@ int main (int argc, char **argv)
    bcm_host_init();
 
    if (argc > 1)
-      audio_dest = atoi(argv[1]);
-      //printf("Test %c\n",argv[1][1]); this is a test of grabbing a character from the string
+      romo_cmd = argv[1];
    if (argc > 2)
-      channels = atoi(argv[2]);
+      cmd_length = atoi(argv[2]);
    if (argc > 3)
-      samplerate = atoi(argv[3]);
+      audio_dest = atoi(argv[3]);
+   if (argc > 4)
+      channels = atoi(argv[4]);
+   if (argc > 5)
+      samplerate = atoi(argv[5]);
 
    printf("Outputting audio to %s\n", audio_dest==0 ? "analogue":"hdmi");
 
-   play_api_test(samplerate, bitdepth, channels, audio_dest);
+   play_api_test(romo_cmd, samplerate, bitdepth, channels, audio_dest);
+   usleep(cmd_length*1000000);
+   // turn off all motors
+   play_api_test("010100000000001100000000", samplerate, bitdepth, channels, audio_dest);
+
    return 0;
 }
 
