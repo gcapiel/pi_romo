@@ -3,6 +3,13 @@ pi_romo
 
 Raspberry Pi Control library for 2nd generation Romotive protocol
 
+Example use:
+To move the Romo forward for 1000 milliseconds use the 2x12 bit parameters below based on the Romotive protocol described further down. The second set of 12 bits are transmisted 12 milliseconds after the first in order to enable near simulataneous firing of the motors.
+
+./hello_audio.bin 010000000001001111111111 1000
+
+----------------
+
 From prior Romotive notes:
 
 We went back to the drawing board and completely revamped the firmware. The new protocol is a PWM signal sent over the audio channel that gives the robot 255 speeds on each motor, along with the ability to have each AUX channel go forward, back, and stop.
