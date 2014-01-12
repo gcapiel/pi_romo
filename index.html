@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Pi Romo  : Raspberry Pi Control library for 2nd generation Romotive protocol" />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Pi Romo </title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/gcapiel/pi_romo">View on GitHub</a>
+
+          <h1 id="project_title">Pi Romo </h1>
+          <h2 id="project_tagline">Raspberry Pi Control library for 2nd generation Romotive protocol</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/gcapiel/pi_romo/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/gcapiel/pi_romo/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <p><img src="https://raw2.github.com/gcapiel/pi_romo/master/demo.gif" alt="animated image of romo robot moving with raspberry pi strapped to it for its brains"></p>
+
+<h1>
+<a name="pi_romo" class="anchor" href="#pi_romo"><span class="octicon octicon-link"></span></a>pi_romo</h1>
+
+<p>Raspberry Pi Control library for 2nd generation Romotive protocol</p>
+
+<p>Example use:
+To move the Romo forward for 1000 milliseconds use the 2x12 bit parameters below based on the Romotive protocol described further down. The second set of 12 bits are transmisted 12 milliseconds after the first in order to enable near simulataneous firing of the motors.</p>
+
+<p>./hello_audio.bin 010000000001001111111111 1000</p>
+
+<hr><p>From prior Romotive notes:</p>
+
+<p>We went back to the drawing board and completely revamped the firmware. The new protocol is a PWM signal sent over the audio channel that gives the robot 255 speeds on each motor, along with the ability to have each AUX channel go forward, back, and stop.</p>
+
+<p>The PWM signal is comprised two channels, the left used for the clock signal and the right for the data signal. The PWM signal is generated as a square wave of 1000hz.</p>
+
+<p>The left channel clock signal comprises of 12 bits. In order to trigger the circuit, the start the square wave has to be low. The peak of each wave denotes a bit. A full 12 bits denotes one command.</p>
+
+<p>The right channel data signal comprises of first 3 bits for the address, the next 8 bits for the  actual command, and the last bit as an even parity bit.</p>
+
+<p>For the first 3 bits, the motor addresses are:</p>
+
+<p>001 – Left motor
+010 – Right Motor
+011 – All 3 Auxiliary Motors
+For the next 8 bits, the commands range from 0 to 255.</p>
+
+<p>0 (00000000) is full reverse
+128 (10000000) is stop
+255 (11111111) is full forward
+Any thing in between those values will give you a partial speed.</p>
+
+<p>The last bit is a parity bit that keep the entire frame even. For example, if you have an address of 001 (left motor) and you want to send it in full reverse (00000000), the last bit has to be 1 to make the entire frame even. So the command for that would be 001000000001.</p>
+
+<p>Each motor is triggered separately. It only seems that they move together because of the short duration of the audio signal sent.</p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Pi Romo  maintained by <a href="https://github.com/gcapiel">gcapiel</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
